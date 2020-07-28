@@ -16,6 +16,7 @@ public class PdfScribe {
 
 	private ClippingSelector clippingSelector = new ClippingSelector();
 	private GeneratePDF generatePDF = new GeneratePDF();
+	private String myOS = System.getProperty("os.name").toLowerCase();
 	
 	int imageCount = 0;
 
@@ -25,11 +26,26 @@ public class PdfScribe {
 		pdfScribe.setupDisplay();
 	}
 	
+	public boolean isWindows() {
+
+		return (myOS.indexOf("win") >= 0);
+	}
+
+	public boolean isUnix() {
+
+		return (myOS.indexOf("nix") >= 0 || myOS.indexOf("nux") >= 0 || myOS.indexOf("aix") > 0 );
+	}
+	
 	public void setupDisplay() {
 		
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		shell.setSize(300, 55);
+		
+		if (isWindows())
+			shell.setSize(318, 65);
+		else if (isUnix())
+			shell.setSize(300, 55);
+		
 		shell.setText("Pdf Scribe");
 		shell.open();
 
