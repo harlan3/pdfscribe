@@ -110,7 +110,7 @@ public class PdfScribe {
 		RowLayout layout = new RowLayout();
 
 		if (isWindows())
-			shell.setSize(318, 65);
+			shell.setSize(318, 70);
 		else if (isUnix())
 			shell.setSize(308, 37);
 
