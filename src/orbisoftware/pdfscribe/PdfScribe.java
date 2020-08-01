@@ -12,21 +12,87 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class PdfScribe {
 
 	private ClippingSelector clippingSelector = new ClippingSelector();
 	private GeneratePDF generatePDF = new GeneratePDF();
 	private String myOS = System.getProperty("os.name").toLowerCase();
-	
-	int imageCount = 0;
+
+	private String fileName = "settings.xml";
+	private HashMap<String, String> xmlMap = new HashMap<>();
+
+	private int imageCount = 0;
 
 	public static void main(String[] args) {
-		
+
 		PdfScribe pdfScribe = new PdfScribe();
+		pdfScribe.loadXML();
+
+		pdfScribe.generatePDF.setPageSize(pdfScribe.xmlMap.get("PdfPageSize"));
+		pdfScribe.generatePDF.borderPercent = Float.parseFloat(pdfScribe.xmlMap.get("BorderPercent"));
+
 		pdfScribe.setupDisplay();
 	}
-	
+
+	private void loadXML() {
+
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.parse(fileName);
+			Element rootElem = doc.getDocumentElement();
+
+			if (rootElem != null) {
+				parseElements(rootElem);
+			}
+		} catch (Exception e) {
+
+			System.out.println("Exception in loadXML(): " + e.toString());
+		}
+	}
+
+	private void parseElements(Element root) {
+
+		String name = "";
+
+		if (root != null) {
+
+			NodeList nl = root.getChildNodes();
+
+			if (nl != null) {
+
+				for (int i = 0; i < nl.getLength(); i++) {
+					Node node = nl.item(i);
+
+					if (node.getNodeName().equalsIgnoreCase("setting")) {
+
+						NodeList childNodes = node.getChildNodes();
+
+						for (int j = 0; j < childNodes.getLength(); j++) {
+
+							Node child = childNodes.item(j);
+
+							if (child.getNodeName().equalsIgnoreCase("name"))
+								name = child.getTextContent();
+							else if (child.getNodeName().equalsIgnoreCase("value"))
+								xmlMap.put(name, child.getTextContent());
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public boolean isWindows() {
 
 		return (myOS.indexOf("win") >= 0);
@@ -34,20 +100,20 @@ public class PdfScribe {
 
 	public boolean isUnix() {
 
-		return (myOS.indexOf("nix") >= 0 || myOS.indexOf("nux") >= 0 || myOS.indexOf("aix") > 0 );
+		return (myOS.indexOf("nix") >= 0 || myOS.indexOf("nux") >= 0 || myOS.indexOf("aix") > 0);
 	}
-	
+
 	public void setupDisplay() {
-		
+
 		Display display = new Display();
-		Shell shell = new Shell(display, (SWT.ON_TOP | SWT.CLOSE | SWT.TITLE));
+		Shell shell = new Shell(display, (SWT.ON_TOP | SWT.RESIZE | SWT.CLOSE | SWT.TITLE));
 		RowLayout layout = new RowLayout();
-		
+
 		if (isWindows())
-			shell.setSize(318, 60);
+			shell.setSize(318, 65);
 		else if (isUnix())
-			shell.setSize(455, 32);
-		
+			shell.setSize(308, 37);
+
 		shell.setText("Pdf Scribe");
 		shell.setLayout(layout);
 		shell.open();
@@ -62,7 +128,7 @@ public class PdfScribe {
 			}
 		};
 		bounds.addListener(SWT.Selection, boundsListener);
-		
+
 		// ***** Snapshot Button *****
 		final Button snapShot = new Button(shell, SWT.PUSH);
 		snapShot.setText("SnapShot");
@@ -74,19 +140,18 @@ public class PdfScribe {
 				// take a snapshot and save the image off for processing
 				final Image image = new Image(display, clippingSelector.clipRect);
 				final GC gc = new GC(display);
-				gc.copyArea(image, clippingSelector.clipRect.x,
-						clippingSelector.clipRect.y);
+				gc.copyArea(image, clippingSelector.clipRect.x, clippingSelector.clipRect.y);
 				gc.dispose();
-				
+
 				BufferedImage saveImage = ImageCoversion.convertToAWT(image.getImageData());
 				generatePDF.imageList.add(saveImage);
 				imageCount++;
-				
+
 				System.out.println("SnapShot #" + Integer.toString(imageCount));
 			}
 		};
 		snapShot.addListener(SWT.Selection, snapShotListener);
-		
+
 		// ***** Save PDF Button *****
 		final Button savePDF = new Button(shell, SWT.PUSH);
 		savePDF.setText("Save PDF");
@@ -107,7 +172,7 @@ public class PdfScribe {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-		
+
 		display.dispose();
 	}
 }

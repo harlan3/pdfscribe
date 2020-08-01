@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Size    Millimeters       Inches            Pixels        DPI = 72
+A0      841 x 1189     33.1 x 46.8       2383 x 3370
+A1      594 x 841      23.4 x 33.1       1685 x 2383
+A2      420 x 594      16.5 x 23.4       1188 x 1685
+A3      297 x 420      11.7 x 16.5        842 x 1188
+A4      210 x 297       8.3 x 11.7        598 x 842
+A5      148 x 210       5.8 x 8.3         418 x 598
+A6      105 x 148       4.1 x 5.8         295 x 418
+Letter  216 x 279       8.5 x 11.0        623 x 792
+Legal   216 x 356       8.5 x 14.0        623 x 1008
+-->
+
+<settings>
+   <setting>
+      <name>PdfPageSize</name>
+      <value>Letter</value>
+   </setting>
+    <setting>
+      <name>BorderPercent</name>
+      <value>0.05</value>
+   </setting>
+</settings>

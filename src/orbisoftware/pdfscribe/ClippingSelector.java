@@ -14,9 +14,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tracker;
 
 public class ClippingSelector {
-	
+
 	public Rectangle clipRect;
-	
+
 	public void showClippingSelector() {
 
 		final Display display = Display.getDefault();
@@ -26,7 +26,7 @@ public class ClippingSelector {
 
 		if (clipRect.height == 0 || clipRect.width == 0)
 			return;
-		
+
 		// we show the selected area in a new shell.
 		final Image image = new Image(display, clipRect);
 		final GC gc = new GC(display);
@@ -44,7 +44,7 @@ public class ClippingSelector {
 
 		shell.open();
 	}
-	
+
 	public Rectangle select() {
 
 		final Display display = Display.getDefault();

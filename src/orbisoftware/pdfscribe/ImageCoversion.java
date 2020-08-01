@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class ImageCoversion {
 
 	static BufferedImage convertToAWT(ImageData data) {
-		
+
 		ColorModel colorModel = null;
 		PaletteData palette = data.palette;
 		if (palette.isDirect) {
@@ -65,7 +65,7 @@ public class ImageCoversion {
 	}
 
 	static ImageData convertToSWT(BufferedImage bufferedImage) {
-		
+
 		if (bufferedImage.getColorModel() instanceof DirectColorModel) {
 			DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
 			PaletteData palette = new PaletteData(colorModel.getRedMask(), colorModel.getGreenMask(),

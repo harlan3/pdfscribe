@@ -16,30 +16,54 @@ import org.eclipse.swt.widgets.Shell;
 
 public class GeneratePDF {
 
-	private final int DPI = 68;
-	private final double border = 0.5;
-
-	private PDRectangle pageSize = PDRectangle.A4;
-
-	private String saveFileName;
+	public PDRectangle pageSize = PDRectangle.A4;
+	public float borderPercent = 0.0f;
 
 	public ArrayList<BufferedImage> imageList = new ArrayList<BufferedImage>();
 
-	private void setPageProperties(int imgWidthPixels, int imgHeightPixels) {
+	private String saveFileName;
 
-		double imgWidthInches = (double) imgWidthPixels / (double) DPI;
-		double imgHeightInches = (double) imgHeightPixels / (double) DPI;
+	public void setPageSize(String paperSizeString) {
 
-		if ((imgWidthInches < 8.27) && (imgHeightInches < 11.69))
-			pageSize = PDRectangle.A4;
-		else if ((imgWidthInches < 11.69) && (imgHeightInches < 16.54))
-			pageSize = PDRectangle.A3;
-		else if ((imgWidthInches < 16.54) && (imgHeightInches < 23.39))
-			pageSize = PDRectangle.A2;
-		else if ((imgWidthInches < 23.39) && (imgHeightInches < 33.11))
-			pageSize = PDRectangle.A1;
-		else
+		switch (paperSizeString) {
+
+		case "A0":
 			pageSize = PDRectangle.A0;
+			break;
+
+		case "A1":
+			pageSize = PDRectangle.A1;
+			break;
+
+		case "A2":
+			pageSize = PDRectangle.A2;
+			break;
+
+		case "A3":
+			pageSize = PDRectangle.A3;
+			break;
+
+		case "A4":
+			pageSize = PDRectangle.A4;
+			break;
+
+		case "A5":
+			pageSize = PDRectangle.A5;
+			break;
+
+		case "A6":
+			pageSize = PDRectangle.A6;
+			break;
+
+		case "Letter":
+			pageSize = PDRectangle.LETTER;
+			break;
+
+		case "Legal":
+			pageSize = PDRectangle.LEGAL;
+			break;
+
+		}
 
 	}
 
@@ -61,31 +85,47 @@ public class GeneratePDF {
 			// Create blank PDF document
 			PDDocument doc = new PDDocument();
 			PDPageContentStream contentStream = null;
+			float scaleFactor = 1.0f;
+			float scaleFactorX = 1.0f;
+			float scaleFactorY = 1.0f;
+			int borderPixelsWidth = 0;
+			int borderPixelsHeight = 0;
 
 			for (int i = 0; i < imageList.size(); i++) {
 
-				PDImageXObject pdImage = LosslessFactory.createFromImage(doc, imageList.get(i));
+				System.out.println("Processing image: " + (i + 1));
 
-				// Use first image to define the PDf page properties
-				if (i == 0)
-					setPageProperties(pdImage.getWidth(), pdImage.getHeight());
+				PDImageXObject pdImage = LosslessFactory.createFromImage(doc, imageList.get(i));
 
 				PDPage page = new PDPage(pageSize);
 				doc.addPage(page);
 
 				contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true, true);
 				PDRectangle cropBox = page.getCropBox();
-				contentStream.drawImage(pdImage, (int) (border * DPI),
-						cropBox.getHeight() - pdImage.getHeight() - (int) (border * DPI));
+
+				borderPixelsWidth = (int) (cropBox.getWidth() * borderPercent);
+				borderPixelsHeight = (int) (cropBox.getHeight() * borderPercent);
+
+				scaleFactorX = (cropBox.getWidth() - (2 * borderPixelsWidth)) / pdImage.getWidth();
+				scaleFactorY = (cropBox.getHeight() - (2 * borderPixelsHeight)) / pdImage.getHeight();
+
+				if (scaleFactorX < scaleFactorY)
+					scaleFactor = scaleFactorX;
+				else
+					scaleFactor = scaleFactorY;
+
+				contentStream.drawImage(pdImage, borderPixelsWidth,
+						cropBox.getHeight() - (pdImage.getHeight() * scaleFactor) - borderPixelsHeight,
+						pdImage.getWidth() * scaleFactor, pdImage.getHeight() * scaleFactor);
 				contentStream.close();
 			}
-			
+
+			System.out.println("Saving to: " + saveFileName);
 			if (saveFileName != null)
 				doc.save(saveFileName);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 }
