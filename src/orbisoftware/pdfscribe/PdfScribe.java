@@ -4,6 +4,7 @@ package orbisoftware.pdfscribe;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
@@ -108,7 +109,12 @@ public class PdfScribe {
 		Display display = new Display();
 		Shell shell = new Shell(display, (SWT.ON_TOP | SWT.RESIZE | SWT.CLOSE | SWT.TITLE));
 		RowLayout layout = new RowLayout();
-
+		RowData rowData= new RowData();
+		 
+		// Width and height of button
+		rowData.width=100;
+		rowData.height=30;
+		
 		if (isWindows())
 			shell.setSize(318, 70);
 		else if (isUnix())
@@ -121,7 +127,7 @@ public class PdfScribe {
 		// ***** Bounds Button *****
 		final Button bounds = new Button(shell, SWT.PUSH);
 		bounds.setText("Bounds");
-		bounds.setBounds(0, 0, 100, 30);
+		bounds.setLayoutData(rowData);
 		Listener boundsListener = new Listener() {
 			public void handleEvent(Event event) {
 				clippingSelector.showClippingSelector();
@@ -132,7 +138,7 @@ public class PdfScribe {
 		// ***** Snapshot Button *****
 		final Button snapShot = new Button(shell, SWT.PUSH);
 		snapShot.setText("SnapShot");
-		snapShot.setBounds(100, 0, 100, 30);
+		snapShot.setLayoutData(rowData);
 		Listener snapShotListener = new Listener() {
 			public void handleEvent(Event event) {
 				if (clippingSelector.clipRect == null)
@@ -155,7 +161,7 @@ public class PdfScribe {
 		// ***** Save PDF Button *****
 		final Button savePDF = new Button(shell, SWT.PUSH);
 		savePDF.setText("Save PDF");
-		savePDF.setBounds(200, 0, 100, 30);
+		savePDF.setLayoutData(rowData);
 
 		Listener savePDFListener = new Listener() {
 			public void handleEvent(Event event) {
@@ -167,6 +173,8 @@ public class PdfScribe {
 		};
 		savePDF.addListener(SWT.Selection, savePDFListener);
 
+		shell.pack();
+		
 		// Sleep until disposed
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
