@@ -107,7 +107,7 @@ public class PdfScribe {
 	public void setupDisplay() {
 
 		Display display = new Display();
-		Shell shell = new Shell(display, (SWT.ON_TOP | SWT.RESIZE | SWT.CLOSE | SWT.TITLE));
+		Shell shell = new Shell(display, (SWT.ON_TOP | SWT.CLOSE | SWT.TITLE));
 		RowLayout layout = new RowLayout();
 		RowData rowData= new RowData();
 		 
